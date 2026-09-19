@@ -1,0 +1,263 @@
+{
+  "info": {
+    "name": "Sistema de Entrega - API",
+    "description": "Coleção de requisições para a API do Sistema de Entrega (autenticação, clientes, entregadores, categorias, produtos e pedidos).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" },
+    { "key": "clienteId", "value": "" },
+    { "key": "entregadorId", "value": "" },
+    { "key": "categoriaId", "value": "" },
+    { "key": "produtoId", "value": "" },
+    { "key": "pedidoId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) { pm.collectionVariables.set('token', json.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Registrar novo usuário (OPERADOR)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/registrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"operador1\",\n  \"password\": \"senha123\",\n  \"role\": \"OPERADOR\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "Criar categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["const json = pm.response.json(); if (json.id) { pm.collectionVariables.set('categoriaId', json.id); }"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/categorias",
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Bebidas\"\n}" }
+          }
+        },
+        {
+          "name": "Listar categorias",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/categorias"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Produtos",
+      "item": [
+        {
+          "name": "Criar produto",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["const json = pm.response.json(); if (json.id) { pm.collectionVariables.set('produtoId', json.id); }"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/produtos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Refrigerante 350ml\",\n  \"descricao\": \"Lata 350ml\",\n  \"preco\": 6.50,\n  \"estoque\": 100,\n  \"categoriaId\": {{categoriaId}}\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar produtos (paginado, com filtros)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/produtos?page=0&size=10&sort=nome,asc&categoriaId={{categoriaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "produtos"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "nome,asc" },
+                { "key": "categoriaId", "value": "{{categoriaId}}" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Criar cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["const json = pm.response.json(); if (json.id) { pm.collectionVariables.set('clienteId', json.id); }"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/clientes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao.silva@email.com\",\n  \"telefone\": \"27999999999\",\n  \"endereco\": {\n    \"rua\": \"Rua das Flores\",\n    \"numero\": \"100\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Vila Velha\",\n    \"estado\": \"ES\",\n    \"cep\": \"29100-000\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar clientes (paginado)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/clientes?page=0&size=10&sort=nome,asc"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Entregadores",
+      "item": [
+        {
+          "name": "Criar entregador",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["const json = pm.response.json(); if (json.id) { pm.collectionVariables.set('entregadorId', json.id); }"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/entregadores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Carlos Souza\",\n  \"cpf\": \"12345678900\",\n  \"telefone\": \"27988887777\",\n  \"veiculo\": \"Moto\",\n  \"placa\": \"ABC1D23\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar entregadores disponíveis",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/entregadores?disponivel=true"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        {
+          "name": "Criar pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["const json = pm.response.json(); if (json.id) { pm.collectionVariables.set('pedidoId', json.id); }"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/pedidos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": {{clienteId}},\n  \"enderecoEntrega\": \"Rua das Flores, 100 - Centro\",\n  \"observacoes\": \"Sem cebola\",\n  \"itens\": [\n    { \"produtoId\": {{produtoId}}, \"quantidade\": 2 }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar pedidos (filtros + paginação)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/pedidos?status=PENDENTE&page=0&size=10&sort=dataCriacao,desc"
+          }
+        },
+        {
+          "name": "Atribuir entregador ao pedido",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/pedidos/{{pedidoId}}/entregador/{{entregadorId}}"
+          }
+        },
+        {
+          "name": "Atualizar status do pedido",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/pedidos/{{pedidoId}}/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"EM_ROTA\"\n}" }
+          }
+        },
+        {
+          "name": "Excluir pedido (somente ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/pedidos/{{pedidoId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
