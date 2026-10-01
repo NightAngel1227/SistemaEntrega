@@ -96,7 +96,7 @@ cd api
 ./mvnw spring-boot:run
 ```
 
-A API sobe por padrão em `http://localhost:8080`.
+A API sobe por padrão em `http://localhost:8081`.
 
 Na primeira execução, um usuário administrador padrão é criado automaticamente (ver `DataSeeder`):
 
@@ -204,3 +204,10 @@ src/main/java/com/example/api
 9. Consultar pedidos com filtros (status, cliente, período) e paginação/ordenação.
 10. Tentar excluir um cliente com um usuário sem papel `ADMIN`, mostrando o controle de acesso (403).
 11. Rodar `./mvnw test` para mostrar a suíte de testes automatizados passando.
+
+## Integrantes do grupo
+1. Carlos Eduardo Pisa Meireles;
+2. Deivid Ramos dos Reis Silva;
+3. Diana Carina Frederich Briere;
+4. Eduardo Augusto Rosario Maciel;
+5. Ruan Victor de Santana Batista.
