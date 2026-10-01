@@ -50,11 +50,11 @@ public class JwtService {
     }
 
     private <T> T extrairClaim(String token, Function<Claims, T> resolver) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+        Claims claims = Jwts.parser()
+                .verifyWith((javax.crypto.SecretKey) getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
         return resolver.apply(claims);
     }
 
